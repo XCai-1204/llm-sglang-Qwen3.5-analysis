@@ -4,7 +4,7 @@
 
 ## 项目摘要
 
-本项目不是只给出“哪个框架更快”，而是展示一条可复用的 GPU 性能分析链路：
+本项目目的是展示一条可复用的 GPU 性能分析链路：
 
 ```mermaid
 flowchart LR
@@ -26,7 +26,7 @@ flowchart LR
 | 单并发 | 171.17 tok/s | 143.74 tok/s | 约 19.1% |
 | 并发 8 | 704.27 tok/s | 665.66 tok/s | 约 5.8% |
 
-在本次模型、硬件和配置组合中，vLLM 吞吐更高。并发升至 8 后差距缩小，说明单请求与批处理场景不能用同一个数字概括。
+在本次模型、硬件和配置组合中，vLLM 吞吐更高。并发升至 8 后差距缩小，表明单请求与批处理场景不能用同一个数字概括。
 
 ### 2. `fused_moe_kernel`
 
@@ -35,7 +35,7 @@ flowchart LR
 | vLLM | 17,280 | 1,007.93 ms | 58.33 μs |
 | SGLang | 3,580 | 1,808.01 ms | 505.03 μs |
 
-SGLang 的平均单次耗时约为 vLLM 的 **8.66×**，但这不等于“整体 MoE 阶段慢 8.66×”：
+SGLang 的平均单次耗时约为 vLLM 的 **8.66×**：
 
 - 两边的调用次数分别为 3,580 和 17,280，执行粒度不同；
 - 本次 trace 中 `fused_moe_kernel` 的累计耗时比为 **1.79×**（1,808.01 / 1,007.93）；
@@ -47,7 +47,7 @@ SGLang 的平均单次耗时约为 vLLM 的 **8.66×**，但这不等于“整�
 | vLLM | 274 | 504.71 ms | 1,841.99 μs |
 | SGLang | 3,581 | 858.25 ms | 239.67 μs |
 
-SGLang 的 AllReduce 单次更短，但调用约为 vLLM 的 **13.07×**，trace 内累计 AllReduce 时间约为 **1.70×**。这说明通信组织方式存在明显差异，但仅凭次数与总时长仍不能判断具体是调度、并行策略还是 workload 切分造成的。
+SGLang 的 AllReduce 单次更短，但调用约为 vLLM 的 **13.07×**，trace 内累计 AllReduce 时间约为 **1.70×**，表明通信组织方式存在明显差异。
 
 ## Timeline 单实例验证
 
@@ -94,9 +94,9 @@ SGLang 的 3,580 次调用均为 `blockX=128`、`registersPerThread=96`。
 
 1. Benchmark 证明本次环境下 vLLM 的吞吐更高，单并发领先约 19.1%，并发 8 领先约 5.8%。
 2. Trace 中最值得继续追踪的差异集中在 `fused_moe_kernel` 与 NCCL AllReduce。
-3. SGLang 单次 MoE Kernel 更长，但调用次数更少；vLLM 调用更多、单次更短，说明两边的工作切分与执行组织不同。
+3. SGLang 单次 MoE Kernel 更长，但调用次数更少；vLLM 调用更多、单次更短，表明两边的工作切分与执行组织不同。
 4. SGLang AllReduce 次数显著更多，trace 内累计通信时间也更高
-5. Trace 还暴露了此前未重点学习的 Gated Delta Network（GDN）相关 Kernel，说明模型结构可以从 GPU 执行轨迹反向识别；本项目的核心归因仍聚焦 MoE 与 NCCL。
+5. Trace 还暴露了此前未重点学习的 Gated Delta Network（GDN）相关 Kernel，表明模型结构可以从 GPU 执行轨迹反向识别。
 
 ## 仓库结构
 
