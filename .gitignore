@@ -1,0 +1,20 @@
+# Nsight raw reports and derived databases
+*.nsys-rep
+*.qdrep
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+
+# Local profiling and raw benchmark outputs
+profiles/
+results/raw/
+work/
+
+# Python and editor artifacts
+__pycache__/
+*.py[cod]
+.venv/
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
